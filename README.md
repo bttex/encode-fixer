@@ -14,9 +14,9 @@ Script Python para corrigir problemas de encoding (acentuação) em arquivos CSV
 ## 📋 Requisitos
 
 - Python 3.6+
-- Biblioteca pandas:
+- Bibliotecas:
   ```bash
-  pip install pandas
+  pip install pandas typer chardet
   ```
 
 ## 🚀 Instalação
@@ -26,7 +26,7 @@ Script Python para corrigir problemas de encoding (acentuação) em arquivos CSV
 chmod +x csv_fixer.py
 
 # Instale as dependências
-pip install pandas
+pip install -r requirements.txt
 ```
 
 ## 📖 Uso Básico
@@ -39,11 +39,11 @@ python csv_fixer.py --csv-path <arquivo> [opções]
 
 ### Argumentos
 
-| Argumento | Obrigatório | Descrição | Exemplo |
-|-----------|-------------|-----------|---------|
-| `--csv-path` | ✅ Sim | Caminho do arquivo CSV original | `--csv-path dados.csv` |
-| `--save-name` | ❌ Não | Nome do arquivo de saída* | `--save-name corrigido.csv` |
-| `--sep` | ❌ Não | Separador de campos (padrão: `;`) | `--sep ","` |
+| Argumento     | Obrigatório | Descrição                         | Exemplo                     |
+| ------------- | ----------- | --------------------------------- | --------------------------- |
+| `--csv-path`  | ✅ Sim      | Caminho do arquivo CSV original   | `--csv-path dados.csv`      |
+| `--save-name` | ❌ Não      | Nome do arquivo de saída\*        | `--save-name corrigido.csv` |
+| `--sep`       | ❌ Não      | Separador de campos (padrão: `;`) | `--sep ","`                 |
 
 \* Se não informado, adiciona `_utf8` ao nome original
 
@@ -110,10 +110,7 @@ O script executa as seguintes etapas:
    - Remove `\n` (quebras de linha internas)
    - Substitui por espaço simples
 
-4. **Adiciona coluna CICLO**
-   - Insere coluna `CICLO` com valor fixo "2025.1"
-
-5. **Salva arquivo**
+4. **Salva arquivo**
    - Encoding: UTF-8-SIG (inclui BOM)
    - Mesmo separador do arquivo original
    - Na mesma pasta do arquivo original
@@ -130,12 +127,14 @@ O script tenta automaticamente os seguintes encodings (nesta ordem):
 ## 📂 Estrutura de Saída
 
 ### Antes
+
 ```
 /pasta/
   └── dados.csv  (encoding desconhecido, com problemas)
 ```
 
 ### Depois (padrão)
+
 ```
 /pasta/
   ├── dados.csv  (original preservado)
@@ -143,6 +142,7 @@ O script tenta automaticamente os seguintes encodings (nesta ordem):
 ```
 
 ### Depois (com --save-name)
+
 ```
 /pasta/
   ├── dados.csv  (original preservado)
@@ -184,6 +184,7 @@ df.to_csv(caminho_saida, index=False, encoding="utf-8", sep=sep or ";")
 **Causa**: Caminho incorreto ou arquivo não existe
 
 **Solução**: Verifique o caminho completo do arquivo
+
 ```bash
 # Use caminho absoluto
 python csv_fixer.py --csv-path /caminho/completo/arquivo.csv
@@ -197,7 +198,8 @@ python csv_fixer.py --csv-path arquivo.csv
 
 **Causa**: Encoding muito específico ou arquivo corrompido
 
-**Solução**: 
+**Solução**:
+
 1. Abra o arquivo no Excel ou LibreOffice
 2. Salve novamente como CSV UTF-8
 3. Rode o script no novo arquivo
@@ -207,6 +209,7 @@ python csv_fixer.py --csv-path arquivo.csv
 **Causa**: Excel não reconheceu o encoding
 
 **Solução**: O script já usa UTF-8-SIG. Se persistir:
+
 1. Abra o Excel
 2. Vá em "Dados" > "De Texto/CSV"
 3. Selecione o arquivo gerado
@@ -217,6 +220,7 @@ python csv_fixer.py --csv-path arquivo.csv
 **Causa**: CSV usa separador diferente de `;`
 
 **Solução**: Use o parâmetro `--sep`
+
 ```bash
 python csv_fixer.py --csv-path dados.csv --sep ","
 ```
@@ -226,6 +230,7 @@ python csv_fixer.py --csv-path dados.csv --sep ","
 **Causa**: Separador incompatível com configuração regional do Excel
 
 **Solução**:
+
 - Para Excel brasileiro: use `;` (padrão)
 - Para Excel internacional: use `,`
 
@@ -236,12 +241,14 @@ python csv_fixer.py --csv-path dados.csv --sep ";"
 ## 📊 Output do Console
 
 ### Sucesso
+
 ```
 [OK] Lido com sucesso (encoding=windows-1252, sep=';')
 ✅ Arquivo corrigido salvo em: /pasta/dados_utf8.csv
 ```
 
 ### Falha de Encoding
+
 ```
 [!] Falhou com utf-8: 'utf-8' codec can't decode byte...
 [!] Falhou com latin1: invalid continuation byte
@@ -250,6 +257,7 @@ python csv_fixer.py --csv-path dados.csv --sep ";"
 ```
 
 ### Arquivo não encontrado
+
 ```
 ❌ Arquivo não encontrado: /caminho/errado.csv
 ```
