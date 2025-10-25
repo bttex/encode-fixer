@@ -1,90 +1,78 @@
-# CSV Encoding Fixer
+# 🔧 CSV Encoding Fixer
 
 Script Python para corrigir problemas de encoding (acentuação) em arquivos CSV e padronizá-los em UTF-8 com BOM (compatível com Excel).
 
-## 🎯 Funcionalidades
+## ✨ Características
 
-- ✅ Detecta automaticamente o encoding correto do arquivo
-- ✅ Corrige problemas de acentuação
+- ✅ **Detecção inteligente de encoding** com chardet (análise automática)
+- ✅ Corrige problemas de acentuação automaticamente
 - ✅ Remove quebras de linha internas nos campos
 - ✅ Salva em UTF-8-SIG (compatível com Excel brasileiro)
 - ✅ Lida com campos contendo vírgulas e aspas
 - ✅ Suporta diferentes separadores (`;`, `,`, etc.)
+- ✅ Validação automática de arquivos com Typer
 
 ## 📋 Requisitos
 
 - Python 3.6+
 - Bibliotecas:
-  ```bash
-  pip install pandas typer chardet
-  ```
+
+```bash
+pip install pandas typer chardet
+```
 
 ## 🚀 Instalação
 
 ```bash
 # Clone ou baixe o script
-chmod +x csv_fixer.py
+git clone https://github.com/bttex/encode-fixer.git
+cd encode-fixer
 
 # Instale as dependências
 pip install -r requirements.txt
 ```
 
-## 📖 Uso Básico
-
-### Sintaxe
+## 💻 Uso
 
 ```bash
 python csv_fixer.py --csv-path <arquivo> [opções]
 ```
 
-### Argumentos
+### Parâmetros
 
-| Argumento     | Obrigatório | Descrição                         | Exemplo                     |
-| ------------- | ----------- | --------------------------------- | --------------------------- |
-| `--csv-path`  | ✅ Sim      | Caminho do arquivo CSV original   | `--csv-path dados.csv`      |
-| `--save-name` | ❌ Não      | Nome do arquivo de saída\*        | `--save-name corrigido.csv` |
-| `--sep`       | ❌ Não      | Separador de campos (padrão: `;`) | `--sep ","`                 |
+| Argumento | Obrigatório | Descrição | Exemplo |
+|-----------|-------------|-----------|---------|
+| `--csv-path` | ✅ Sim | Caminho do arquivo CSV original | `--csv-path dados.csv` |
+| `--save-name` | ❌ Não | Nome do arquivo de saída* | `--save-name corrigido.csv` |
+| `--sep` | ❌ Não | Separador de campos (padrão: `;`) | `--sep ","` |
 
 \* Se não informado, adiciona `_utf8` ao nome original
 
-## 💡 Exemplos de Uso
+## 📝 Exemplos
 
-### 1. Uso básico (separador padrão `;`)
-
+### Uso básico (detecta encoding automaticamente)
 ```bash
 python csv_fixer.py --csv-path dados.csv
 ```
+**Resultado:** Cria `dados_utf8.csv` na mesma pasta
 
-**Resultado**: Cria `dados_utf8.csv` na mesma pasta
-
-### 2. Definir nome personalizado para saída
-
+### Com nome personalizado
 ```bash
 python csv_fixer.py --csv-path dados.csv --save-name dados_corrigidos.csv
 ```
+**Resultado:** Cria `dados_corrigidos.csv` na mesma pasta
 
-**Resultado**: Cria `dados_corrigidos.csv` na mesma pasta
-
-### 3. CSV com vírgula como separador
-
+### CSV com vírgula como separador
 ```bash
 python csv_fixer.py --csv-path dados.csv --sep ","
 ```
 
-### 4. CSV com ponto-e-vírgula (explícito)
-
-```bash
-python csv_fixer.py --csv-path dados.csv --sep ";"
-```
-
-### 5. Arquivo em caminho completo
-
+### Caminho absoluto
 ```bash
 python csv_fixer.py --csv-path /home/usuario/documentos/dados.csv
 ```
 
-### 6. Combinando todas as opções
-
+### Exemplo completo
 ```bash
 python csv_fixer.py \
   --csv-path /home/usuario/dados_originais.csv \
@@ -92,67 +80,84 @@ python csv_fixer.py \
   --sep ","
 ```
 
-## 🔄 Processo de Conversão
+## 🔍 Como Funciona
 
 O script executa as seguintes etapas:
 
-1. **Detecção automática de encoding**
-   - Testa: UTF-8, Latin1, ISO-8859-1, Windows-1252
-   - Usa o primeiro que funcionar
+### 1. **Detecção Inteligente de Encoding**
+- Usa a biblioteca `chardet` para analisar o arquivo
+- Lê uma amostra (1MB) para detectar o encoding
+- Mostra a confiança da detecção (ex: 85%)
+- Fallback automático para encodings comuns se necessário
 
-2. **Leitura do CSV**
-   - Parser tolerante a problemas de formatação
-   - Respeita campos entre aspas
-   - Pula linhas com erros (modo `skip`)
+### 2. **Ordem de Tentativa**
+Se chardet detectar um encoding, ele é testado primeiro. Depois, tenta:
+- UTF-8 (padrão moderno)
+- Windows-1252 (padrão Windows/português BR)
+- Latin1 (comum em sistemas Linux/Unix)
+- ISO-8859-1 (padrão europeu ocidental)
 
-3. **Limpeza de dados**
-   - Remove `\r` (carriage return)
-   - Remove `\n` (quebras de linha internas)
-   - Substitui por espaço simples
+### 3. **Leitura do CSV**
+- Parser tolerante a problemas de formatação
+- Respeita campos entre aspas
+- Pula linhas com erros (modo `skip`)
 
-4. **Salva arquivo**
-   - Encoding: UTF-8-SIG (inclui BOM)
-   - Mesmo separador do arquivo original
-   - Na mesma pasta do arquivo original
+### 4. **Limpeza de Dados**
+- Remove `\r` (carriage return)
+- Remove `\n` (quebras de linha internas)
+- Substitui por espaço simples
 
-## 🎓 Encodings Testados
+### 5. **Salva Arquivo**
+- Encoding: UTF-8-SIG (inclui BOM)
+- Mesmo separador do arquivo original
+- Na mesma pasta do arquivo original
 
-O script tenta automaticamente os seguintes encodings (nesta ordem):
+## 📊 Saída do Console
 
-1. **UTF-8** - Padrão moderno
-2. **Latin1** - Comum em sistemas Linux/Unix
-3. **ISO-8859-1** - Padrão europeu ocidental
-4. **Windows-1252** - Padrão Windows (português/BR)
+### Detecção bem-sucedida:
+```
+[i] Detecção automática (chardet): windows-1252 (Confiança: 85%)
+[i] Ordem de tentativa: ['windows-1252', 'utf-8', 'latin1', 'iso-8859-1']
+✅ [OK] Lido com sucesso (encoding=windows-1252, sep=';')
+✅ Arquivo corrigido salvo em: /pasta/dados_utf8.csv
+```
 
-## 📂 Estrutura de Saída
+### Detecção com fallback:
+```
+[i] Detecção automática (chardet): ascii (Confiança: 45%)
+[i] Ordem de tentativa: ['ascii', 'utf-8', 'windows-1252', 'latin1', 'iso-8859-1']
+[!] Falhou com ascii: UnicodeDecodeError
+✅ [OK] Lido com sucesso (encoding=utf-8, sep=';')
+✅ Arquivo corrigido salvo em: /pasta/dados_utf8.csv
+```
 
-### Antes
+## 📂 Estrutura de Arquivos
 
+### Antes:
 ```
 /pasta/
-  └── dados.csv  (encoding desconhecido, com problemas)
+└── dados.csv (encoding desconhecido, com problemas)
 ```
 
-### Depois (padrão)
-
+### Depois (uso básico):
 ```
 /pasta/
-  ├── dados.csv  (original preservado)
-  └── dados_utf8.csv  (UTF-8-SIG, corrigido)
+├── dados.csv (original preservado)
+└── dados_utf8.csv (UTF-8-SIG, corrigido)
 ```
 
-### Depois (com --save-name)
-
+### Depois (com --save-name):
 ```
 /pasta/
-  ├── dados.csv  (original preservado)
-  └── dados_corrigidos.csv  (UTF-8-SIG, corrigido)
+├── dados.csv (original preservado)
+└── dados_corrigidos.csv (UTF-8-SIG, corrigido)
 ```
+
+## ⚙️ Personalizações Avançadas
 
 ### Desabilitar remoção de quebras de linha
 
-Comente as linhas 44-48:
-
+Comente as linhas 81-85 em `csv_fixer.py`:
 ```python
 # df = df.map(
 #     lambda x: str(x).replace("\r", " ").replace("\n", " ")
@@ -163,28 +168,25 @@ Comente as linhas 44-48:
 
 ### Mudar encoding de saída
 
-Linha 53, altere `utf-8-sig` para outro encoding:
-
+Linha 88, altere `utf-8-sig` para outro encoding:
 ```python
-df.to_csv(caminho_saida, index=False, encoding="utf-8", sep=sep or ";")
+df.to_csv(caminho_saida, index=False, encoding="utf-8", sep=sep)
 ```
 
-## ⚠️ Notas Importantes
+## ⚠️ Avisos Importantes
 
-1. **Arquivo original preservado**: O script NUNCA sobrescreve o arquivo original
-2. **UTF-8-SIG vs UTF-8**: O BOM (Byte Order Mark) permite que o Excel reconheça acentos corretamente
-3. **Quebras de linha**: São removidas automaticamente para evitar problemas de importação
-4. **Linhas problemáticas**: São ignoradas automaticamente (`on_bad_lines="skip"`)
-5. **Coluna CICLO**: É sempre adicionada ao final do arquivo
+- **Arquivo original preservado:** O script NUNCA sobrescreve o arquivo original
+- **UTF-8-SIG vs UTF-8:** O BOM (Byte Order Mark) permite que o Excel reconheça acentos corretamente
+- **Quebras de linha:** São removidas automaticamente para evitar problemas de importação
+- **Linhas problemáticas:** São ignoradas automaticamente (`on_bad_lines="skip"`)
+- **Detecção automática:** O chardet tem alta precisão, mas em casos raros pode errar (o fallback ajuda)
 
-## 🐛 Resolução de Problemas
+## 🐛 Solução de Problemas
 
-### Erro: "Arquivo não encontrado"
+### ❌ Erro: "Arquivo não encontrado"
+**Causa:** Caminho incorreto ou arquivo não existe
 
-**Causa**: Caminho incorreto ou arquivo não existe
-
-**Solução**: Verifique o caminho completo do arquivo
-
+**Solução:** Verifique o caminho completo do arquivo
 ```bash
 # Use caminho absoluto
 python csv_fixer.py --csv-path /caminho/completo/arquivo.csv
@@ -194,43 +196,27 @@ cd /pasta/do/arquivo
 python csv_fixer.py --csv-path arquivo.csv
 ```
 
-### Erro: "Não foi possível ler o CSV"
+### ❌ Erro: "Não foi possível ler o CSV com nenhum dos encodings testados"
+**Causa:** Encoding muito específico, arquivo corrompido, ou não é um CSV válido
 
-**Causa**: Encoding muito específico ou arquivo corrompido
-
-**Solução**:
-
+**Solução:**
 1. Abra o arquivo no Excel ou LibreOffice
 2. Salve novamente como CSV UTF-8
 3. Rode o script no novo arquivo
 
-### Acentos ainda errados no Excel
+### ❌ Acentos aparecem errados no Excel
+**Causa:** Excel não reconheceu o encoding (raro, pois usamos UTF-8-SIG)
 
-**Causa**: Excel não reconheceu o encoding
-
-**Solução**: O script já usa UTF-8-SIG. Se persistir:
-
+**Solução:** 
 1. Abra o Excel
 2. Vá em "Dados" > "De Texto/CSV"
 3. Selecione o arquivo gerado
 4. Escolha "UTF-8" manualmente
 
-### Separador errado
+### ❌ Separador não funciona no Excel
+**Causa:** Separador incompatível com configuração regional do Excel
 
-**Causa**: CSV usa separador diferente de `;`
-
-**Solução**: Use o parâmetro `--sep`
-
-```bash
-python csv_fixer.py --csv-path dados.csv --sep ","
-```
-
-### Dados ficaram em uma única coluna no Excel
-
-**Causa**: Separador incompatível com configuração regional do Excel
-
-**Solução**:
-
+**Solução:**
 - Para Excel brasileiro: use `;` (padrão)
 - Para Excel internacional: use `,`
 
@@ -238,46 +224,35 @@ python csv_fixer.py --csv-path dados.csv --sep ","
 python csv_fixer.py --csv-path dados.csv --sep ";"
 ```
 
-## 📊 Output do Console
+### ⚠️ Detecção reporta baixa confiança
+**Causa:** Arquivo pequeno ou com encoding ambíguo
 
-### Sucesso
+**Solução:** O script tentará automaticamente outros encodings. Se falhar, especifique manualmente editando a lista de fallbacks no código.
 
-```
-[OK] Lido com sucesso (encoding=windows-1252, sep=';')
-✅ Arquivo corrigido salvo em: /pasta/dados_utf8.csv
-```
-
-### Falha de Encoding
-
-```
-[!] Falhou com utf-8: 'utf-8' codec can't decode byte...
-[!] Falhou com latin1: invalid continuation byte
-[OK] Lido com sucesso (encoding=windows-1252, sep=';')
-✅ Arquivo corrigido salvo em: /pasta/dados_utf8.csv
-```
-
-### Arquivo não encontrado
-
-```
-❌ Arquivo não encontrado: /caminho/errado.csv
-```
-
-## 📝 Casos de Uso
+## 🎯 Casos de Uso
 
 - ✅ Corrigir CSVs exportados de sistemas legados
 - ✅ Padronizar encoding para importação no BigQuery
 - ✅ Preparar dados para Excel brasileiro
 - ✅ Limpar campos com quebras de linha indesejadas
-- ✅ Adicionar colunas de controle (CICLO, data, etc.)
+- ✅ Converter CSVs de múltiplas origens para um padrão único
 
-## 🔗 Compatibilidade
+## 🖥️ Compatibilidade
 
-- **Sistema Operacional**: Windows, Linux, macOS
-- **Python**: 3.6 ou superior
-- **Excel**: Todas as versões (graças ao UTF-8-SIG)
-- **Google Sheets**: Importa corretamente
-- **BigQuery**: Pronto para upload
+- **Sistema Operacional:** Windows, Linux, macOS
+- **Python:** 3.6 ou superior
+- **Excel:** Todas as versões (graças ao UTF-8-SIG)
+- **Google Sheets:** Importa corretamente
+- **BigQuery:** Pronto para upload
 
 ## 📄 Licença
 
 Este script é fornecido como está, sem garantias.
+
+## 🤝 Contribuições
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests.
+
+---
+
+**Desenvolvido com ❤️ para facilitar o trabalho com CSVs problemáticos**
